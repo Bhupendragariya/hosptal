@@ -107,3 +107,75 @@ export const postAppointment = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Error creating appointment", 500));
   }
 });
+
+
+
+export const getAllAppointments = catchAsyncErrors(async( req, res, next) =>{
+  try {
+    const appointments = await Appointment.find();
+    if(!appointments){
+      return next(new ErrorHandler("No appointments found", 400))
+    }
+    res.status(200).json({
+      success: true,
+      message: "All appointments",
+      appointments,
+    })
+  } catch (error) {
+    console.error ("error fetching appointments:", error.message)
+    return next(new ErrorHandler("Error Fetching appointments ", 500))
+    
+  }
+});
+
+export const updateAppointment = catchAsyncErrors(async( req, res, next) =>{
+try {
+    const {id} = req.params;
+    let appointment = await Appointment.findById(id); 
+
+    if(!appointment){
+      return next (new ErrorHandler("Appointment not found", 400))
+    }
+    appointment = await Appointment.findByIdAndUpdate(id, req.body, {
+      new: true, 
+      runValidators: true,
+      useFindAndModify: false,
+    });
+  
+    res.status(200).json({
+      success: true,
+      message: "Appointment updated successfully",
+      appointment,
+    });
+} catch (error) {
+  console.error("error updating appointment:", error.message);
+  return next(new ErrorHandler("Error updating appointment", 500 ))
+  
+}
+
+});
+
+
+export const deleteAppointment = catchAsyncErrors( async ( req, res, next) =>{
+
+
+  try {
+     const {id} = req.params;
+      let appointment = await Appointment.findById(id); 
+  
+      if(!appointment){
+        return next (new ErrorHandler("Appointment not found", 400))
+      }
+      await appointment.deleteOne();
+  
+      res.status(200).json({
+        success: true, 
+        message: "Appointment deleted successfully",
+      });
+  } catch (error) {
+    console.error("error deleting appointment:", error.message);
+    return next(new ErrorHandler("error deleting appointment", 500));
+    
+    
+  }
+})
