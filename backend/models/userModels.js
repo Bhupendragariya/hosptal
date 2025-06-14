@@ -75,7 +75,13 @@ const userSchema = new mongoose.Schema({
   docAvatar:{
     public_id:String,
     url: String,
-  }
+  },
+  
+  referstoken: {
+    type: String,
+    default: null,
+    select: false
+  },
 
 });
 
@@ -92,7 +98,7 @@ userSchema.pre("save", async function(next){
 
 
 userSchema.methods.comparePassword = async function(Password){
-    return await bcrypt.compare(Password, this.password,);
+    return await bcrypt.compare(Password, this.password);
 }
 
 
